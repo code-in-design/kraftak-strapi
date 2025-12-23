@@ -82,7 +82,7 @@ export default factories.createCoreController(
         try {
           await strapi.plugins["email"].services.email.send({
             to: adminEmail,
-            subject: `[TRIFORCE] New Contact Inquiry - ${data.inquiryType}`,
+            subject: `[KRAFTAK] New Contact Inquiry - ${data.inquiryType}`,
             html: `
               <h2>New Contact Inquiry</h2>
               <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
