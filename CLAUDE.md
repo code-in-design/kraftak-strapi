@@ -249,3 +249,28 @@ yarn start
 - AWS ID: logan.kim@manshigan.com
 - S3 버킷: kraftak (ap-northeast-2)
 - CDN: https://d22tqurpl3v1pl.cloudfront.net
+
+### EC2
+- 인스턴스 ID: i-09c57812466af251e
+- 인스턴스 타입: t3.small
+- 퍼블릭 IP: 43.201.6.99
+- 보안 그룹: kraftak-ec2-sg (sg-0b49c75ea84a5c30f)
+- 키 페어: kraftak-key
+
+### RDS
+- 인스턴스 ID: kraftak-db
+- 엔진: PostgreSQL 15
+- 호스트: kraftak-db.c564mi2yg7ll.ap-northeast-2.rds.amazonaws.com
+- 포트: 5432
+- 데이터베이스: kraftak
+- 사용자: kraftak_admin
+- 보안 그룹: kraftak-rds-sg (sg-0c6c8ad7145105918)
+
+### 배포
+- GitHub Actions: main 브랜치 푸시 시 자동 배포
+- PM2: kraftak-prod
+- Nginx: 리버스 프록시 (80 -> 1337)
+
+### 접속 정보
+- 관리자 패널: http://43.201.6.99/admin
+- SSH: `ssh -i kraftak-key.pem ec2-user@43.201.6.99`
