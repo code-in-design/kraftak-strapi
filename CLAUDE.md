@@ -253,7 +253,7 @@ yarn start
 ### EC2
 - 인스턴스 ID: i-09c57812466af251e
 - 인스턴스 타입: t3.small
-- 퍼블릭 IP: 43.201.6.99
+- 탄력적 IP: 13.209.112.166 (eipalloc-0fd595ab4dd4bf1f0)
 - 보안 그룹: kraftak-ec2-sg (sg-0b49c75ea84a5c30f)
 - 키 페어: kraftak-key
 
@@ -272,5 +272,5 @@ yarn start
 - Nginx: 리버스 프록시 (80 -> 1337)
 
 ### 접속 정보
-- 관리자 패널: http://43.201.6.99/admin
-- SSH: `ssh -i kraftak-key.pem ec2-user@43.201.6.99`
+- 관리자 패널: http://13.209.112.166/admin
+- SSH: `ssh -i kraftak-key.pem ec2-user@13.209.112.166`
