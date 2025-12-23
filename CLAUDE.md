@@ -204,8 +204,14 @@ AWS_ACL=public-read
 - `contacts-create.postman_collection.json` - 문의 생성 (에러 케이스 포함)
 
 ### Postman 환경변수 설정
-- `API_ROOT`: API 기본 URL (예: `http://localhost:1337`)
-- `API_TOKEN`: API 인증 토큰 (운영환경용)
+
+**로컬 환경 (로컬.postman_environment.json)**
+- `API_ROOT`: `http://localhost:1337`
+- `API_TOKEN`: 불필요 (Public 권한)
+
+**운영 환경 (운영.postman_environment.json)**
+- `API_ROOT`: `https://api.kraftak.com`
+- `API_TOKEN`: API 인증 토큰
 
 ## 개발 명령어
 ```bash
@@ -272,5 +278,14 @@ yarn start
 - Nginx: 리버스 프록시 (80 -> 1337)
 
 ### 접속 정보
-- 관리자 패널: http://13.209.112.166/admin
+- 도메인: https://api.kraftak.com
+- 관리자 패널: https://api.kraftak.com/admin
 - SSH: `ssh -i kraftak-key.pem ec2-user@13.209.112.166`
+
+### 관리자 계정
+- 이메일: admin@kraftak.com
+- 비밀번호: Kraftak2025!
+
+### API 토큰 (프론트엔드용)
+- Access Key: `06d0597501698dc0077029d45c4c5f79813b14aba1c6d3da77cea2b6ec6aa452be6f7491d11026dae9cd2ed963e3b21d752dec8a9dd65175c5533367527b595c354c68f4365a62003e1fcc80b35ef7f5ce2c84b198f1ed8c886be49f1b8d0a73f82b610b8c68bb6496d636d50d416d19acfb40c0d295754bf203c447417e85e2`
+- 사용법: `Authorization: Bearer <Access Key>` 헤더로 전송

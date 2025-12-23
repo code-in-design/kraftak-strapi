@@ -21,7 +21,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"data\": {\n    \"name\": \"홍길동\",\n    \"email\": \"hong@example.com\",\n    \"inquiryType\": \"Product Inquiry\",\n    \"inquiryProduct\": \"Superflex (DTF Film)\",\n    \"country\": \"South Korea\",\n    \"company\": \"홍길동 주식회사\",\n    \"subject\": \"제품 문의\",\n    \"message\": \"문의 내용입니다.\"\n  }\n}",
+          "raw": "{\n  \"data\": {\n    \"name\": \"홍길동\",\n    \"email\": \"hong@example.com\",\n    \"inquiryType\": \"Product Inquiry\",\n    \"inquiryProduct\": \"GRIMDAL\",\n    \"country\": \"South Korea\",\n    \"company\": \"홍길동 주식회사\",\n    \"subject\": \"제품 문의\",\n    \"message\": \"문의 내용입니다.\"\n  }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -33,7 +33,7 @@
           "host": ["{{API_ROOT}}"],
           "path": ["api", "contacts"]
         },
-        "description": "## 필드 설명\n\n### name (필수)\n- 타입: string\n- 최소 1자, 최대 100자\n\n### email (필수)\n- 타입: email\n- 올바른 이메일 형식 필요\n\n### inquiryType (필수)\n- 타입: enum\n- 가능한 값:\n  - `Product Inquiry`\n  - `Partnership`\n  - `OEM / ODM`\n  - `Dealer distribution`\n  - `Other`\n\n### inquiryProduct (선택)\n- 타입: enum\n- 가능한 값:\n  - `Superflex (DTF Film)`\n  - `Prinstick (UV DTF Film)`\n\n### country (필수)\n- 타입: string\n\n### company (선택)\n- 타입: string\n\n### subject (필수)\n- 타입: string\n- 최소 1자, 최대 200자\n\n### message (필수)\n- 타입: text\n- 최소 1자\n\n## 성공 응답\n```json\n{\n  \"success\": true,\n  \"message\": \"문의가 접수되었습니다.\"\n}\n```"
+        "description": "## 필드 설명\n\n### name (필수)\n- 타입: string\n- 최소 1자, 최대 100자\n\n### email (필수)\n- 타입: email\n- 올바른 이메일 형식 필요\n\n### inquiryType (필수)\n- 타입: enum\n- 가능한 값:\n  - `Product Inquiry`\n  - `Partnership`\n  - `OEM / ODM`\n  - `Dealer distribution`\n  - `Other`\n\n### inquiryProduct (선택)\n- 타입: enum\n- 가능한 값:\n  - `GRIMDAL`\n  - `CHROMA`\n  - `EVERFLOW`\n  - `ESSENTIAL WHITE`\n\n### country (필수)\n- 타입: string\n\n### company (선택)\n- 타입: string\n\n### subject (필수)\n- 타입: string\n- 최소 1자, 최대 200자\n\n### message (필수)\n- 타입: text\n- 최소 1자\n\n## 성공 응답\n```json\n{\n  \"success\": true,\n  \"message\": \"문의가 접수되었습니다.\"\n}\n```"
       }
     },
     {
