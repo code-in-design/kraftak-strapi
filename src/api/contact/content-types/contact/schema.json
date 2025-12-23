@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contacts",
+  "info": {
+    "singularName": "contact",
+    "pluralName": "contacts",
+    "displayName": "문의 내역",
+    "description": "Contact inquiries"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "inquiryType": {
+      "type": "enumeration",
+      "enum": [
+        "Product Inquiry",
+        "Partnership",
+        "OEM / ODM",
+        "Dealer distribution",
+        "Other"
+      ],
+      "required": true
+    },
+    "inquiryProduct": {
+      "type": "enumeration",
+      "enum": [
+        "GRIMDAL",
+        "CHROMA",
+        "EVERFLOW",
+        "ESSENTIAL WHITE"
+      ],
+      "required": false
+    },
+    "country": {
+      "type": "string",
+      "required": true
+    },
+    "company": {
+      "type": "string",
+      "required": false
+    },
+    "subject": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "message": {
+      "type": "text",
+      "required": true,
+      "minLength": 1
+    }
+  }
+}

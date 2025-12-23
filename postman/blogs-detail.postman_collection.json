@@ -1,0 +1,33 @@
+{
+  "info": {
+    "name": "GET /blogs/:documentId",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "블로그 상세 조회",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_TOKEN}}",
+            "description": "운영환경에서만 필요"
+          }
+        ],
+        "url": {
+          "raw": "{{API_ROOT}}/api/blogs/:documentId",
+          "host": ["{{API_ROOT}}"],
+          "path": ["api", "blogs", ":documentId"],
+          "variable": [
+            {
+              "key": "documentId",
+              "value": "",
+              "description": "블로그 Document ID"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

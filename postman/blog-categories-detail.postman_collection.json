@@ -1,0 +1,33 @@
+{
+  "info": {
+    "name": "GET /blog-categories/:documentId",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "카테고리 상세 조회",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_TOKEN}}",
+            "description": "운영환경에서만 필요"
+          }
+        ],
+        "url": {
+          "raw": "{{API_ROOT}}/api/blog-categories/:documentId",
+          "host": ["{{API_ROOT}}"],
+          "path": ["api", "blog-categories", ":documentId"],
+          "variable": [
+            {
+              "key": "documentId",
+              "value": "",
+              "description": "카테고리 Document ID"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

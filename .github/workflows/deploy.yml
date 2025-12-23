@@ -1,0 +1,233 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  EC2_HOST: 15.165.63.247
+  EC2_USER: ec2-user
+  APP_NAME: triforce-strapi
+  API_URL: https://api.triforceflex.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AWS_EC2_KEY }}
+
+      - name: Add Host Key to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts 2>&1
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: SCP - Copy dist to EC2
+        run: scp -r dist ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/home/${{ env.EC2_USER }}/${{ env.APP_NAME }}/
+
+      - name: SSH - Update code and restart PM2
+        run: |
+          ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << 'EOF'
+          cd /home/ec2-user/triforce-strapi
+
+          # 최신 소스 코드 pull (dist 제외)
+          git fetch origin
+          git checkout origin/main -- src config package.json yarn.lock ecosystem.config.js tsconfig.json
+
+          # 의존성 설치 (package.json 변경 시에만 필요)
+          yarn install --frozen-lockfile --production
+
+          # PM2 재시작
+          pm2 restart ecosystem.config.js --only triforce-prod --env production
+          EOF
+
+      # 배포 완료 대기 (20초)
+      - name: Wait for deployment to stabilize
+        run: sleep 20
+
+      # 헬스 체크
+      - name: Health Check
+        id: health-check
+        run: |
+          echo "Checking health endpoint: ${{ env.API_URL }}/api/health"
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "${{ env.API_URL }}/api/health" || echo "000")
+
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "Health check passed! Status: $RESPONSE"
+            echo "HEALTH_STATUS=success" >> $GITHUB_ENV
+          else
+            echo "Health check failed! Status: $RESPONSE"
+            echo "HEALTH_STATUS=failed" >> $GITHUB_ENV
+            exit 1
+          fi
+
+      # 커밋 내역 수집
+      - name: Collect Commit Messages
+        id: collect-commits
+        if: success()
+        run: |
+          PREVIOUS_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?status=success&branch=${{ github.ref_name }}&per_page=2" \
+            | jq -r '.workflow_runs[1].head_sha // ""')
+
+          if [ -z "$PREVIOUS_SHA" ] || [ "$PREVIOUS_SHA" = "null" ]; then
+            echo "첫 배포이거나 이전 배포를 찾을 수 없습니다. 최근 5개 커밋을 표시합니다."
+            COMMITS=$(git log --pretty=format:"• %s (%an)" -n 5)
+          else
+            echo "이전 배포 SHA: $PREVIOUS_SHA"
+            echo "현재 배포 SHA: ${{ github.sha }}"
+            COMMITS=$(git log --pretty=format:"• %s (%an)" $PREVIOUS_SHA..${{ github.sha }})
+          fi
+
+          COMMIT_COUNT=$(echo "$COMMITS" | wc -l)
+          if [ "$COMMIT_COUNT" -gt 10 ]; then
+            COMMITS=$(echo "$COMMITS" | head -n 10)
+            COMMITS="$COMMITS"$'\n'"• ... 그 외 $(($COMMIT_COUNT - 10))개 커밋"
+          fi
+
+          echo "COMMIT_MESSAGES<<EOF" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # Slack 알림 - 성공
+      - name: Slack Notification - Success
+        if: success()
+        run: |
+          jq -n \
+            --arg text "✅ Triforce Strapi 배포 성공!" \
+            --arg env "Production (EC2)" \
+            --arg version "gh-action-${{ github.sha }}" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg url "${{ env.API_URL }}" \
+            --arg commits "$COMMIT_MESSAGES" \
+            --arg actor "${{ github.actor }}" \
+            --arg repo "${{ github.repository }}" \
+            --arg sha "${{ github.sha }}" \
+            --arg short_sha "${GITHUB_SHA:0:7}" \
+            '{
+              text: $text,
+              blocks: [
+                {
+                  type: "header",
+                  text: {
+                    type: "plain_text",
+                    text: "✅ Triforce Strapi 배포 성공"
+                  }
+                },
+                {
+                  type: "section",
+                  fields: [
+                    {
+                      type: "mrkdwn",
+                      text: ("*환경:*\n" + $env)
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: ("*브랜치:*\n" + $branch)
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: "*헬스 체크:*\n통과 ✅"
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: ("*URL:*\n" + $url)
+                    }
+                  ]
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: ("*배포된 커밋 내역:*\n" + $commits)
+                  }
+                },
+                {
+                  type: "context",
+                  elements: [
+                    {
+                      type: "mrkdwn",
+                      text: ("배포자: " + $actor + " | 커밋: <https://github.com/" + $repo + "/commit/" + $sha + "|" + $short_sha + ">")
+                    }
+                  ]
+                }
+              ]
+            }' | curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+              -H 'Content-Type: application/json' \
+              -d @-
+
+      # Slack 알림 - 실패
+      - name: Slack Notification - Failure
+        if: failure()
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "text": "❌ Triforce Strapi 배포 실패!",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ Triforce Strapi 배포 실패"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*환경:*\nProduction (EC2)"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*브랜치:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*헬스 체크:*\n실패 ❌"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "⚠️ *즉시 확인이 필요합니다!*"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "배포자: ${{ github.actor }} | <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|워크플로우 로그 확인>"
+                    }
+                  ]
+                }
+              ]
+            }'
