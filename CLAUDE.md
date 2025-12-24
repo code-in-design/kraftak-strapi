@@ -312,3 +312,22 @@ yarn start
 ### API 토큰 (프론트엔드용)
 - Access Key: `06d0597501698dc0077029d45c4c5f79813b14aba1c6d3da77cea2b6ec6aa452be6f7491d11026dae9cd2ed963e3b21d752dec8a9dd65175c5533367527b595c354c68f4365a62003e1fcc80b35ef7f5ce2c84b198f1ed8c886be49f1b8d0a73f82b610b8c68bb6496d636d50d416d19acfb40c0d295754bf203c447417e85e2`
 - 사용법: `Authorization: Bearer <Access Key>` 헤더로 전송
+
+---
+
+## 개발 히스토리
+
+### 2025.12.23
+- AWS 인프라 구성 (EC2, RDS, S3, CloudFront)
+- Strapi v5 CMS 초기 세팅
+- 블로그/카테고리/문의 API 구현
+- 도메인 연결 및 SSL 설정
+- 문의 접수 시 관리자 이메일 알림 기능
+- GitHub Actions CI/CD 파이프라인 구축
+
+### 2025.12.24
+- **메인 배너 API 추가**
+  - Banner singleType 컨텐츠 타입 생성
+  - `GET /api/banner` 엔드포인트
+  - Public 권한 설정 (토큰 없이 접근 가능)
+  - Postman 컬렉션 추가 (`banner.postman_collection.json`)
