@@ -5,17 +5,17 @@
 import { factories } from "@strapi/strapi";
 
 export default factories.createCoreController(
-  "api::banner.banner",
+  "api::banner.banner" as any,
   ({ strapi }) => ({
     // 배너 조회
     async find(ctx) {
       try {
-        const banner = await strapi.documents("api::banner.banner").findFirst({
+        const banner = (await strapi.documents("api::banner.banner" as any).findFirst({
           status: "published",
           populate: {
             backgroundImage: true,
           },
-        });
+        })) as any;
 
         if (!banner) {
           return {
