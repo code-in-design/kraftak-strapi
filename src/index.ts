@@ -1,5 +1,5 @@
 import "reflect-metadata";
-// import type { Core } from '@strapi/strapi';
+import type { Core } from "@strapi/strapi";
 
 export default {
   /**
@@ -17,5 +17,31 @@ export default {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // Set up public permissions for banner API
+    const publicRole = await strapi
+      .query("plugin::users-permissions.role")
+      .findOne({ where: { type: "public" } });
+
+    if (publicRole) {
+      const bannerPermission = await strapi
+        .query("plugin::users-permissions.permission")
+        .findOne({
+          where: {
+            role: publicRole.id,
+            action: "api::banner.banner.find",
+          },
+        });
+
+      if (!bannerPermission) {
+        await strapi.query("plugin::users-permissions.permission").create({
+          data: {
+            action: "api::banner.banner.find",
+            role: publicRole.id,
+          },
+        });
+        console.log("[Bootstrap] Banner public permission created");
+      }
+    }
+  },
 };
