@@ -1,0 +1,26 @@
+{
+  "info": {
+    "name": "GET /banner",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "메인 배너 조회",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{API_TOKEN}}",
+            "description": "운영환경에서만 필요"
+          }
+        ],
+        "url": {
+          "raw": "{{API_ROOT}}/api/banner",
+          "host": ["{{API_ROOT}}"],
+          "path": ["api", "banner"]
+        }
+      }
+    }
+  ]
+}

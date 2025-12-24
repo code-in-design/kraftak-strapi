@@ -66,13 +66,34 @@ AWS_ACL=public-read
 
 개발환경에서는 인증 불필요, 운영환경에서는 Bearer 토큰 필요
 
-| Method | Endpoint                        | 설명                        |
-|--------|---------------------------------|-----------------------------|
-| GET    | `/api/blogs`                    | 블로그 목록                 |
-| GET    | `/api/blogs/:documentId`        | 블로그 상세 (moreStories 포함) |
-| GET    | `/api/blog-categories`          | 카테고리 목록               |
-| GET    | `/api/blog-categories/:documentId` | 카테고리 상세            |
-| POST   | `/api/contacts`                 | 문의 생성                   |
+| Method | Endpoint                           | 설명                           |
+|--------|------------------------------------|---------------------------------|
+| GET    | `/api/banner`                      | 메인 배너                       |
+| GET    | `/api/blogs`                       | 블로그 목록                     |
+| GET    | `/api/blogs/:documentId`           | 블로그 상세 (moreStories 포함)  |
+| GET    | `/api/blog-categories`             | 카테고리 목록                   |
+| GET    | `/api/blog-categories/:documentId` | 카테고리 상세                   |
+| POST   | `/api/contacts`                    | 문의 생성                       |
+
+### 메인 배너 API (`GET /api/banner`)
+
+메인 페이지 히어로 섹션의 배너 이미지를 조회합니다.
+
+#### 응답 예시
+```json
+{
+  "data": {
+    "documentId": "xxx",
+    "title": "Kraftak DTF Ink",
+    "subtitle": "Premium Quality",
+    "backgroundImage": {
+      "url": "https://d22tqurpl3v1pl.cloudfront.net/...",
+      "width": 1920,
+      "height": 1080
+    }
+  }
+}
+```
 
 ### 블로그 목록 API (`GET /api/blogs`)
 
@@ -197,6 +218,7 @@ AWS_ACL=public-read
 ## Postman 컬렉션
 
 `postman/` 폴더에 엔드포인트별 컬렉션 파일:
+- `banner.postman_collection.json` - 메인 배너 조회
 - `blogs-list.postman_collection.json` - 블로그 목록 조회
 - `blogs-detail.postman_collection.json` - 블로그 상세 조회
 - `blog-categories-list.postman_collection.json` - 카테고리 목록 조회
@@ -235,9 +257,10 @@ yarn start
 │   ├── admin/
 │   │   └── app.tsx     # 관리자 패널 한글화
 │   └── api/
-│       ├── blog/       # 블로그 API (커스텀 컨트롤러)
+│       ├── banner/         # 메인 배너 API (singleType)
+│       ├── blog/           # 블로그 API (커스텀 컨트롤러)
 │       ├── blog-category/  # 카테고리 API (커스텀 컨트롤러)
-│       └── contact/    # 문의 API (커스텀 컨트롤러)
+│       └── contact/        # 문의 API (커스텀 컨트롤러)
 ├── postman/            # Postman 컬렉션
 └── .env                # 환경변수
 ```
