@@ -77,7 +77,16 @@ AWS_ACL=public-read
 
 ### 메인 배너 API (`GET /api/banner`)
 
-메인 페이지 히어로 섹션의 배너 이미지를 조회합니다.
+메인 페이지 히어로 섹션의 배너 이미지를 조회합니다. 데스크탑/태블릿/모바일 각각 다른 이미지를 설정할 수 있습니다.
+
+#### 응답 필드
+| 필드 | 필수 | 설명 |
+|------|------|------|
+| `backgroundImage` | O | 데스크탑용 배경 이미지 (기본) |
+| `backgroundImageTablet` | X | 태블릿용 배경 이미지 |
+| `backgroundImageMobile` | X | 모바일용 배경 이미지 |
+| `title` | X | 배너 제목 |
+| `subtitle` | X | 배너 부제목 |
 
 #### 응답 예시
 ```json
@@ -87,12 +96,36 @@ AWS_ACL=public-read
     "title": "Kraftak DTF Ink",
     "subtitle": "Premium Quality",
     "backgroundImage": {
-      "url": "https://d22tqurpl3v1pl.cloudfront.net/...",
+      "url": "https://d22tqurpl3v1pl.cloudfront.net/desktop.jpg",
       "width": 1920,
       "height": 1080
+    },
+    "backgroundImageTablet": {
+      "url": "https://d22tqurpl3v1pl.cloudfront.net/tablet.jpg",
+      "width": 768,
+      "height": 1024
+    },
+    "backgroundImageMobile": {
+      "url": "https://d22tqurpl3v1pl.cloudfront.net/mobile.jpg",
+      "width": 375,
+      "height": 667
     }
   }
 }
+```
+
+#### 프론트엔드 사용 가이드
+```typescript
+// 반응형 이미지 선택 로직 예시
+const getBackgroundImage = (banner: Banner, screenWidth: number) => {
+  if (screenWidth <= 768 && banner.backgroundImageMobile) {
+    return banner.backgroundImageMobile.url;
+  }
+  if (screenWidth <= 1024 && banner.backgroundImageTablet) {
+    return banner.backgroundImageTablet.url;
+  }
+  return banner.backgroundImage.url; // 기본값: 데스크탑
+};
 ```
 
 ### 블로그 목록 API (`GET /api/blogs`)

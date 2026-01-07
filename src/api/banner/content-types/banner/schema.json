@@ -18,6 +18,18 @@
       "required": true,
       "allowedTypes": ["images"]
     },
+    "backgroundImageTablet": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "backgroundImageMobile": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
     "title": {
       "type": "string"
     },

@@ -14,6 +14,8 @@ export default factories.createCoreController(
           status: "published",
           populate: {
             backgroundImage: true,
+            backgroundImageTablet: true,
+            backgroundImageMobile: true,
           },
         })) as any;
 
@@ -29,6 +31,8 @@ export default factories.createCoreController(
             title: banner.title,
             subtitle: banner.subtitle,
             backgroundImage: banner.backgroundImage,
+            backgroundImageTablet: banner.backgroundImageTablet,
+            backgroundImageMobile: banner.backgroundImageMobile,
           },
         };
       } catch (error) {
