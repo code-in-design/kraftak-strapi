@@ -1,0 +1,56 @@
+name: Renew SSL Certificate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1,15 * *'  # 매월 1일, 15일 자동 갱신 체크
+
+env:
+  EC2_HOST: 13.209.112.166
+  EC2_USER: ec2-user
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Add Host Key to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts 2>&1
+
+      - name: Renew SSL Certificate
+        run: |
+          ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << 'EOF'
+          echo "=== Current certificate status ==="
+          sudo certbot certificates 2>&1
+
+          echo ""
+          echo "=== Renewing certificate ==="
+          sudo certbot renew --force-renewal 2>&1
+
+          echo ""
+          echo "=== Reloading Nginx ==="
+          sudo systemctl reload nginx
+
+          echo ""
+          echo "=== New certificate status ==="
+          sudo certbot certificates 2>&1
+          EOF
+
+      - name: Verify HTTPS
+        run: |
+          sleep 5
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://api.kraftak.com" || echo "000")
+          echo "HTTPS status: $RESPONSE"
+          if [ "$RESPONSE" -ne "000" ]; then
+            echo "SSL renewal successful!"
+          else
+            echo "Warning: HTTPS check returned $RESPONSE"
+          fi
