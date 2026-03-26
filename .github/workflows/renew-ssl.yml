@@ -25,6 +25,15 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts 2>&1
 
+      - name: Enable systemd auto-renewal timer
+        run: |
+          ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << 'EOF'
+          echo "=== Enabling certbot-renew.timer ==="
+          sudo systemctl enable certbot-renew.timer
+          sudo systemctl start certbot-renew.timer
+          sudo systemctl status certbot-renew.timer
+          EOF
+
       - name: Renew SSL Certificate
         run: |
           ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << 'EOF'
@@ -33,7 +42,7 @@ jobs:
 
           echo ""
           echo "=== Renewing certificate ==="
-          sudo certbot renew --force-renewal 2>&1
+          sudo certbot renew 2>&1
 
           echo ""
           echo "=== Reloading Nginx ==="
