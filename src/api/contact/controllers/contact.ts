@@ -77,7 +77,7 @@ export default factories.createCoreController(
         );
 
         // Send email notification to admin
-        const adminEmail = process.env.ADMIN_EMAIL || "support@manprotek.com";
+        const adminEmail = "sales@kraftak.com";
 
         try {
           await strapi.plugins["email"].services.email.send({
