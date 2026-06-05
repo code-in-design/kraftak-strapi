@@ -1,0 +1,69 @@
+name: SMTP Check (manual)
+
+on:
+  workflow_dispatch:
+
+env:
+  EC2_HOST: 13.209.112.166
+  EC2_USER: ec2-user
+
+jobs:
+  smtp-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Add Host Key to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts 2>&1
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Run SMTP verify + send on EC2
+        run: |
+          cat > smtpcheck.js <<'JS'
+          const fs = require("fs");
+          const env = Object.fromEntries(
+            fs.readFileSync(".env", "utf8")
+              .split("\n")
+              .filter((l) => l.includes("="))
+              .map((l) => {
+                const i = l.indexOf("=");
+                return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^["']|["']$/g, "")];
+              })
+          );
+          const nodemailer = require("nodemailer");
+          const t = nodemailer.createTransport({
+            host: env.SMTP_HOST,
+            port: Number(env.SMTP_PORT),
+            secure: true,
+            auth: { user: env.SMTP_USER, pass: (env.SMTP_PASS || "").replace(/ /g, "") },
+          });
+          (async () => {
+            console.log("SMTP_USER:", env.SMTP_USER, "| ADMIN_EMAIL:", env.ADMIN_EMAIL || "(unset)", "| FROM:", env.SMTP_DEFAULT_FROM || "(unset)");
+            try {
+              await t.verify();
+              console.log("VERIFY: OK");
+            } catch (e) {
+              console.log("VERIFY: FAIL", e.responseCode || e.code, e.message);
+              return;
+            }
+            try {
+              const i = await t.sendMail({
+                from: env.SMTP_USER,
+                to: "ceo@codeindesign.kr",
+                subject: "[메일발송 점검] kraftak 서버 SMTP 테스트",
+                text: "kraftak 서버 SMTP 발송이 정상 동작하는지 확인하기 위한 점검용 메일입니다. (코드인디자인)",
+              });
+              console.log("SEND: OK", i.messageId, JSON.stringify(i.accepted));
+            } catch (e) {
+              console.log("SEND: FAIL", e.responseCode || e.code, e.message);
+            }
+          })();
+          JS
+          B64=$(base64 -w0 smtpcheck.js)
+          ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "cd ~/kraftak-strapi && echo $B64 | base64 -d > _smtpcheck.js && node _smtpcheck.js; rm -f _smtpcheck.js"
