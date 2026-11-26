@@ -135,15 +135,9 @@ yarn start
 - 관리자 패널: https://api.kraftak.com/admin
 - SSH: `ssh -i kraftak-key.pem ec2-user@13.209.112.166`
 
-### 관리자 계정
-- 이메일: admin@kraftak.com
-- 비밀번호: Kraftak2025!
+### 관리자 계정, API 토큰
 
-### API 토큰 (프론트엔드용)
-- Access Key: `06d0597501698dc0077029d45c4c5f79813b14aba1c6d3da77cea2b6ec6aa452be6f7491d11026dae9cd2ed963e3b21d752dec8a9dd65175c5533367527b595c354c68f4365a62003e1fcc80b35ef7f5ce2c84b198f1ed8c886be49f1b8d0a73f82b610b8c68bb6496d636d50d416d19acfb40c0d295754bf203c447417e85e2`
-- 사용법: `Authorization: Bearer <Access Key>` 헤더로 전송
-
----
+옵시디언 `01 - Projects/kraftak/AWS-인프라.md` 에 있다. 저장소에 값을 적지 않는다.
 
 ## 개발 히스토리
 
